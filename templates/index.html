@@ -13,18 +13,30 @@
             <option value="{{ network }}">{{ network }}</option>
             {% endfor %}
         </select>
-        <input type="password" name="password" placeholder="WiFi 비밀번호" required>
+        <input name="password" placeholder="WiFi 비밀번호" required>
         <button type="submit">연결</button>
     </form>
+
+    <p id="result"></p> <!-- 🟡 Result will appear here -->
 
     <script>
         document.getElementById("wifi-form").onsubmit = function(event) {
             event.preventDefault();
+            const result = document.getElementById("result");
+            result.textContent = "Connecting...";
+
             fetch("/connect", {
                 method: "POST",
                 body: new FormData(event.target)
             }).then(response => response.json())
-              .then(data => alert(data.success ? "연결 성공!" : "연결 실패!"));
+              .then(data => {
+                  result.textContent = data.success ? "Success!" : "Fail";
+                  result.style.color = data.success ? "green" : "red";
+              })
+              .catch(() => {
+                  result.textContent = "Error occurred";
+                  result.style.color = "orange";
+              });
         };
     </script>
 </body>
